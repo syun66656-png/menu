@@ -1,0 +1,10 @@
+name: MenuPlugin
+version: 1.0.0
+main: kr.scfarm.menu.MenuPlugin
+api-version: '1.21'
+author: scfarm
+description: 완전 config 기반 메뉴 플러그인 (마인팜)
+# 이동은 WarpCraft에 위임. glyph/shift/nexo-item 은 Nexo가 있으면 사용.
+softdepend: [WarpCraft, Nexo]
+# 메뉴 열기/리로드 명령어는 config(open-commands, reload.command)에서 읽어
+# 런타임에 동적 등록한다 → 여기 commands 블록은 두지 않는다.

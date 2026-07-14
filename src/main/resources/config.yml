@@ -1,0 +1,31 @@
+# ═══════════════════════════════════════════
+#  MenuPlugin - 전역 설정
+# ═══════════════════════════════════════════
+
+# 메뉴 열기 스팸 방지
+cooldown:
+  enabled: true
+  seconds: 3
+
+# WarpCraft(자체 이동 시스템) 연동
+warp:
+  mode: console-command                        # 콘솔 warpother 실행 (권장)
+  command-format: "warpother {player} {warp}"  # {player}, {warp} 치환
+
+# 리로드 명령어 (OP 전용)
+reload:
+  command: "메뉴리로드"
+  permission: "menu.reload"                    # 없으면 '없는 명령어'로 처리
+
+# Shift + F (스니크 + 오프핸드 교체 키)로 메뉴 열기
+sneak-swap-open:
+  enabled: true
+  menu: "hub"
+
+# 모든 메시지 (MiniMessage + Nexo, 전부 수정 가능)
+messages:
+  cooldown: "<red>메뉴는 {seconds}초에 한 번만 열 수 있습니다.</red>"
+  no-permission: "<red>권한이 없습니다.</red>"
+  warp-unavailable: "<red>지금은 이동 시스템을 사용할 수 없습니다.</red>"
+  reload-success: "<green>메뉴 설정을 다시 불러왔습니다.</green>"
+  unknown-command: "<red>알 수 없는 명령어입니다. /help 를 입력해 보세요.</red>"

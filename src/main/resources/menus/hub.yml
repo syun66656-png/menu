@@ -1,0 +1,117 @@
+open-commands: ["메뉴", "menu", "apsb"]   # 이 메뉴 여는 명령어들
+open-permission: ""                        # 비우면 전체 허용
+
+gui:
+  rows: 5                                   # 45칸
+  title: "<shift:-8><glyph:menu>"          # MiniMessage + Nexo
+  open-sound: { key: "minecraft:block.chest.open", volume: 0.6, pitch: 1.2 }
+
+filler:                                     # 빈 칸 채우기 (원하면 enabled: true)
+  enabled: false
+  item: { material: PAPER, custom-model-data: 20001, name: " " }
+
+buttons:
+  # ───── 상단 (0~17) ─────
+  spawn:                                    # 스폰 이동
+    slot: "0-2, 9-11"       # 묶음/범위 지정 (= 0,1,2,9,10,11)
+    item:
+      material: PAPER
+      custom-model-data: 20000
+      name: "<green><bold>스폰</bold></green>"
+      lore: ["<gray>메인 스폰으로 이동합니다.</gray>"]
+    sound: { key: "minecraft:ui.button.click", volume: 1.0, pitch: 1.0 }
+    type: warp
+    warp: spawn                             # ← WarpCraft DB 저장 이름
+  island:                                   # 섬 이동
+    slot: "3-4, 12-13"
+    item:
+      material: PAPER
+      custom-model-data: 20000
+      name: "<aqua><bold>내 섬</bold></aqua>"
+      lore: ["<gray>내 섬으로 이동합니다.</gray>"]
+    sound: { key: "minecraft:ui.button.click", volume: 1.0, pitch: 1.0 }
+    type: warp
+    warp: island
+  shop:                                     # 상점 이동
+    slot: "5-6, 14-15"
+    item:
+      material: PAPER
+      custom-model-data: 20000
+      name: "<gold><bold>상점</bold></gold>"
+      lore: ["<gray>상점으로 이동합니다.</gray>"]
+    type: warp
+    warp: shop
+  auction:                                  # 경매장 (명령어)
+    slot: "7-8, 16-17"
+    item:
+      material: PAPER
+      custom-model-data: 20000
+      name: "<yellow><bold>경매장</bold></yellow>"
+      lore: ["<gray>경매장을 엽니다.</gray>"]
+    type: command
+    command: "경매장"                        # '/' 없이. 기본 플레이어로 실행
+    # as: player                            # (선택) player(기본) | console
+
+  # ───── 중간 (18~35) : 직업 버튼 등 추후 추가 ─────
+  # mine:
+  #   slot: "20-21, 29-30"
+  #   view-requirement: { permission: "menu.job.miner", on-fail: hide }
+  #   item: { material: PAPER, custom-model-data: 20000, name: "<gray>광산</gray>" }
+  #   type: warp
+  #   warp: mine
+
+  # ───── 하단 아이콘 (36~44) ─────
+  mailbox:                                  # 36 우편함
+    slot: [36]
+    item: { material: PAPER, custom-model-data: 20000, name: "<white>우편함</white>" }
+    type: command
+    command: "우편함"
+  settings:                                 # 37 개인 설정
+    slot: [37]
+    item: { material: PAPER, custom-model-data: 20000, name: "<white>개인 설정</white>" }
+    type: command
+    command: "개인설정"
+  minigame:                                 # 38 미니게임 서버 이동
+    slot: [38]
+    item: { material: PAPER, custom-model-data: 20000, name: "<white>미니 게임</white>" }
+    type: warp
+    warp: minigame
+  creditshop:                               # 39 크레딧 상점 이동
+    slot: [39]
+    item: { material: PAPER, custom-model-data: 20000, name: "<white>크레딧 상점</white>" }
+    type: warp
+    warp: creditshop
+  wiki:                                     # 40 메시지(+링크)
+    slot: [40]
+    item: { material: PAPER, custom-model-data: 20000, name: "<white>공식 위키</white>" }
+    type: message
+    message:
+      text: "<glyph:wiki><shift:4><green><u>공식 위키 바로가기</u></green>"  # Nexo glyph/shift 지원
+      url: "https://wiki.scfarm.kr"         # (선택) 있으면 클릭 시 링크 열림
+      hover: "<gray>클릭하여 위키 열기</gray>"  # (선택)
+  support:                                  # 41 메시지(+링크), 문구/URL 별도
+    slot: [41]
+    item: { material: PAPER, custom-model-data: 20000, name: "<white>고객센터</white>" }
+    type: message
+    message:
+      text: "<glyph:support><shift:4><green><u>고객센터 바로가기</u></green>"
+      url: "https://support.scfarm.kr"
+      hover: "<gray>클릭하여 고객센터 열기</gray>"
+  discord:                                  # 42 메시지(+링크), 문구/URL 별도
+    slot: [42]
+    item: { material: PAPER, custom-model-data: 20000, name: "<white>디스코드</white>" }
+    type: message
+    message:
+      text: "<glyph:discord><shift:4><aqua><u>디스코드 참여하기</u></aqua>"
+      url: "https://discord.gg/xxxxxx"
+      hover: "<gray>클릭하여 디스코드 참여</gray>"
+  trash:                                    # 43 휴지통
+    slot: [43]
+    item: { material: PAPER, custom-model-data: 20000, name: "<white>휴지통</white>" }
+    type: command
+    command: "쓰레기통"
+  storage:                                  # 44 개인 창고
+    slot: [44]
+    item: { material: PAPER, custom-model-data: 20000, name: "<white>개인 창고</white>" }
+    type: command
+    command: "창고"
