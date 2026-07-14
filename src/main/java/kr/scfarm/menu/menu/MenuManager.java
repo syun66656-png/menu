@@ -15,7 +15,6 @@ import kr.scfarm.menu.config.Requirement;
 import kr.scfarm.menu.cooldown.CooldownManager;
 import kr.scfarm.menu.integration.WarpBridge;
 import kr.scfarm.menu.util.Text;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -112,8 +111,7 @@ public final class MenuManager {
         }
 
         MenuHolder holder = new MenuHolder();
-        Component title = Text.mm(definition.title());
-        Inventory inventory = Bukkit.createInventory(holder, definition.size(), title);
+        Inventory inventory = Bukkit.createInventory(holder, definition.size(), definition.titleComponent());
         MenuView view = new MenuView(definition, inventory);
         holder.attach(view);
 
@@ -180,15 +178,23 @@ public final class MenuManager {
             button.sound().play(player);
         }
 
-        // close-on-click(기본 true): open 타입은 새 메뉴가 대체하므로 강제 닫지 않음.
-        if (button.closeOnClick() && button.type() != ButtonType.OPEN) {
-            player.closeInventory();
+        ButtonHandler handler = handlers.get(button.type());
+        if (handler == null) {
+            return;
         }
 
-        ButtonHandler handler = handlers.get(button.type());
-        if (handler != null) {
+        // 클릭 이벤트 처리 도중 인벤토리 열기/닫기·명령 실행은 유령 아이템/GUI 꼬임을
+        // 유발할 수 있으므로 다음 틱으로 지연한다.
+        plugin.getServer().getScheduler().runTask(plugin, () -> {
+            if (!player.isOnline()) {
+                return;
+            }
+            // close-on-click(기본 true): open 타입은 새 메뉴가 대체하므로 강제 닫지 않음.
+            if (button.closeOnClick() && button.type() != ButtonType.OPEN) {
+                player.closeInventory();
+            }
             handler.handle(player, button);
-        }
+        });
     }
 
     public CooldownManager cooldownManager() {

@@ -61,10 +61,12 @@ public final class CommandRegistrar {
             commandMap.register(FALLBACK_PREFIX, reloadCommand);
             registered.add(reloadCommand);
         }
+
+        // 클라이언트 탭완성/명령 트리에 반영.
+        syncCommands();
     }
 
     /** 등록했던 명령어를 모두 해제(리로드/비활성 시). */
-    @SuppressWarnings("unchecked")
     public void unregister(CommandMap commandMap) {
         if (commandMap == null) {
             commandMap = commandMap();
@@ -76,17 +78,22 @@ public final class CommandRegistrar {
         Map<String, Command> known = knownCommands(commandMap);
         for (Command command : registered) {
             command.unregister(commandMap);
-            if (known != null) {
-                List<String> labels = new ArrayList<>();
-                labels.add(command.getName());
-                labels.addAll(command.getAliases());
-                for (String label : new ArrayList<>(labels)) {
-                    known.remove(label);
-                    known.remove(FALLBACK_PREFIX + ":" + label);
-                }
-            }
+        }
+        // 라벨이 아니라 "우리가 등록한 인스턴스"만 제거한다.
+        // (다른 플러그인과 이름이 겹쳐도 그 명령어를 지우지 않기 위함)
+        if (known != null) {
+            known.values().removeIf(registered::contains);
         }
         registered.clear();
+    }
+
+    private void syncCommands() {
+        try {
+            Method sync = Bukkit.getServer().getClass().getMethod("syncCommands");
+            sync.invoke(Bukkit.getServer());
+        } catch (Throwable ignored) {
+            // syncCommands 미지원 서버면 무시(실행에는 영향 없음).
+        }
     }
 
     private CommandMap commandMap() {

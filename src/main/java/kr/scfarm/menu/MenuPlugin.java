@@ -2,6 +2,7 @@ package kr.scfarm.menu;
 
 import kr.scfarm.menu.command.CommandRegistrar;
 import kr.scfarm.menu.listener.MenuClickListener;
+import kr.scfarm.menu.listener.PlayerCleanupListener;
 import kr.scfarm.menu.listener.SneakSwapListener;
 import kr.scfarm.menu.menu.MenuManager;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -35,6 +36,7 @@ public final class MenuPlugin extends JavaPlugin {
             // 리스너 등록.
             getServer().getPluginManager().registerEvents(new MenuClickListener(menuManager), this);
             getServer().getPluginManager().registerEvents(new SneakSwapListener(menuManager), this);
+            getServer().getPluginManager().registerEvents(new PlayerCleanupListener(menuManager), this);
 
             // 활성화 성공 (주황) — 전 플러그인 통일 형식(§9-4).
             getComponentLogger().info(mm.deserialize(

@@ -39,10 +39,13 @@ public final class Text {
         if (raw == null) {
             return Component.empty();
         }
-        Component parsed = deserialize(raw);
-        // MiniMessage 결과 자체는 이탤릭을 지정하지 않으므로, 호출부(ItemBuilder)에서
-        // decoration 을 제어한다. 여기서는 순수 파싱만 담당.
-        return parsed;
+        // 잘못된 MiniMessage 한 줄이 메뉴 오픈 전체를 중단시키지 않도록 격리.
+        // 파싱 실패 시 원문을 평문으로 표시한다.
+        try {
+            return deserialize(raw);
+        } catch (Exception ex) {
+            return Component.text(raw);
+        }
     }
 
     /** 아이템 이름/로어용: 바닐라 기본 이탤릭을 제거한 컴포넌트. */

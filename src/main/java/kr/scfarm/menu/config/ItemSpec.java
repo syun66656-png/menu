@@ -27,6 +27,9 @@ public final class ItemSpec {
     private final int amount;
     private final boolean glow;
 
+    /** 정적 아이템은 열 때마다 MiniMessage 파싱/재생성하지 않도록 템플릿을 캐싱(§TPS). */
+    private ItemStack template;
+
     private ItemSpec(String nexoItem, Material material, Integer customModelData, String itemModel,
                      String name, List<String> lore, int amount, boolean glow) {
         this.nexoItem = nexoItem;
@@ -59,8 +62,21 @@ public final class ItemSpec {
         return new ItemSpec(nexoItem, material, cmd, itemModel, name, lore, amount, glow);
     }
 
-    /** ItemStack 을 생성한다. */
+    /**
+     * ItemStack 을 반환한다. 최초 1회만 실제로 구성(파싱 포함)하고 이후에는 캐시를
+     * 복제해 돌려주므로, 메뉴를 열 때마다 발생하던 MiniMessage 파싱 비용을 없앤다.
+     * ItemSpec 은 리로드마다 새로 생성되므로 캐시는 리로드 시 자동 무효화된다.
+     */
     public ItemStack build() {
+        ItemStack cached = template;
+        if (cached == null) {
+            cached = construct();
+            template = cached;
+        }
+        return cached.clone();
+    }
+
+    private ItemStack construct() {
         ItemStack base = null;
         if (nexoItem != null && !nexoItem.isBlank()) {
             base = NexoHook.itemFromId(nexoItem);

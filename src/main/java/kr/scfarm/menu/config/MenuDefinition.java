@@ -1,5 +1,7 @@
 package kr.scfarm.menu.config;
 
+import kr.scfarm.menu.util.Text;
+import net.kyori.adventure.text.Component;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -21,6 +23,9 @@ public final class MenuDefinition {
     private final boolean fillerEnabled;
     private final ItemSpec fillerItem;
     private final Map<String, ButtonDefinition> buttons;
+
+    /** 정적 타이틀은 열 때마다 파싱하지 않도록 캐싱(§TPS). */
+    private Component titleComponent;
 
     private MenuDefinition(String id, List<String> openCommands, String openPermission, int rows, String title,
                            SoundSpec openSound, boolean fillerEnabled, ItemSpec fillerItem,
@@ -91,6 +96,16 @@ public final class MenuDefinition {
 
     public String title() {
         return title;
+    }
+
+    /** 파싱된 타이틀 컴포넌트(최초 1회 파싱 후 캐시). */
+    public Component titleComponent() {
+        Component cached = titleComponent;
+        if (cached == null) {
+            cached = Text.mm(title);
+            titleComponent = cached;
+        }
+        return cached;
     }
 
     public SoundSpec openSound() {
