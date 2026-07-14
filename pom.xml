@@ -16,13 +16,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>25</maven.compiler.release>
         <!--
-          paper-api 버전. 반드시 papermc 저장소에 실제로 존재하는 버전이어야 한다.
-          존재하는 버전 목록 확인:
+          paper-api 버전 — 26.1부터 표기 방식이 바뀜(구 -R0.1-SNAPSHOT 폐지).
+          새 형식: {버전}.build.{빌드번호}-{상태}   예) 26.2.build.56-alpha, 26.1.2.build.23-alpha
+          존재하는 버전 목록(브라우저에서 열어 확인):
             https://repo.papermc.io/service/rest/repository/browse/maven-public/io/papermc/paper/paper-api/
-          26.2(실험)는 Maven 저장소에 아직 배포되지 않았을 수 있음 → 기본값은 안정판 26.1.2.
-          위 목록에서 실제 표기를 확인해 그대로 적을 것 (예: 26.1.2-R0.1-SNAPSHOT).
+          안정판(26.1.2)을 쓰려면 위 목록에서 26.1.2.build.N 계열 최신 항목을 골라 그대로 적을 것.
         -->
-        <paper.version>26.1.2-R0.1-SNAPSHOT</paper.version>
+        <paper.version>26.2.build.56-alpha</paper.version>
     </properties>
 
     <repositories>
