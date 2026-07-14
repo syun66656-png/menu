@@ -15,14 +15,29 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>25</maven.compiler.release>
-        <!-- Paper 26.2(실험) / 안정 26.1.2 로 교체 가능. 26.x는 MojMap → 리매핑 불필요. -->
-        <paper.version>26.2-R0.1-SNAPSHOT</paper.version>
+        <!--
+          paper-api 버전. 반드시 papermc 저장소에 실제로 존재하는 버전이어야 한다.
+          존재하는 버전 목록 확인:
+            https://repo.papermc.io/service/rest/repository/browse/maven-public/io/papermc/paper/paper-api/
+          26.2(실험)는 Maven 저장소에 아직 배포되지 않았을 수 있음 → 기본값은 안정판 26.1.2.
+          위 목록에서 실제 표기를 확인해 그대로 적을 것 (예: 26.1.2-R0.1-SNAPSHOT).
+        -->
+        <paper.version>26.1.2-R0.1-SNAPSHOT</paper.version>
     </properties>
 
     <repositories>
         <repository>
             <id>papermc</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <!-- paper-api 는 SNAPSHOT 배포 → snapshot 해석 명시 + 캐시된 실패를
+                 무시하고 항상 재확인하도록 updatePolicy 지정 -->
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
         </repository>
         <!-- Nexo (소프트 의존, 선택) -->
         <repository>
