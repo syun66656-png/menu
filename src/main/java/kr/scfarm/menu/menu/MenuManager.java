@@ -44,6 +44,14 @@ public final class MenuManager {
 
     /** 최초 로드 및 리로드 공통 경로: config + menus 재로딩, 핸들러/브리지 재구성. */
     public void reload() {
+        // 열려 있는 우리 GUI 를 모두 닫는다 — 리로드 이전 정의(MenuView)가
+        // 계속 클릭을 처리하는 상태를 남기지 않기 위함.
+        for (Player online : plugin.getServer().getOnlinePlayers()) {
+            if (online.getOpenInventory().getTopInventory().getHolder() instanceof MenuHolder) {
+                online.closeInventory();
+            }
+        }
+
         plugin.reloadConfig();
         this.config = PluginConfig.from(plugin.getConfig());
         this.menus = menuLoader.loadAll();
@@ -178,20 +186,21 @@ public final class MenuManager {
             button.sound().play(player);
         }
 
+        // 모든 버튼은 클릭 즉시 GUI 를 닫는다(타입 무관).
+        // 이벤트가 항상 취소되어 커서 아이템이 없으므로 동기 close 는 안전하고,
+        // 창이 바로 닫혀 같은 틱 더블클릭으로 인한 동작 이중 실행도 차단된다.
+        player.closeInventory();
+
         ButtonHandler handler = handlers.get(button.type());
         if (handler == null) {
             return;
         }
 
-        // 클릭 이벤트 처리 도중 인벤토리 열기/닫기·명령 실행은 유령 아이템/GUI 꼬임을
-        // 유발할 수 있으므로 다음 틱으로 지연한다.
+        // 실제 동작(명령/이동/메뉴열기/메시지)은 클릭 이벤트 처리 밖(다음 틱)에서 실행
+        // → 명령이 다른 GUI 를 여는 경우의 인벤토리 꼬임 방지.
         plugin.getServer().getScheduler().runTask(plugin, () -> {
             if (!player.isOnline()) {
                 return;
-            }
-            // close-on-click(기본 true): open 타입은 새 메뉴가 대체하므로 강제 닫지 않음.
-            if (button.closeOnClick() && button.type() != ButtonType.OPEN) {
-                player.closeInventory();
             }
             handler.handle(player, button);
         });

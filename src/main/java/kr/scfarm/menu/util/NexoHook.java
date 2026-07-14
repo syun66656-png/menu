@@ -22,7 +22,12 @@ public final class NexoHook {
     private NexoHook() {
     }
 
-    private static boolean resolved = false;
+    /**
+     * volatile 더블체크: 텍스트 파싱마다 호출되는 {@link #isAvailable()} 이
+     * 락 없이 fast-path 를 타도록 한다. resolve() 안에서 available 을 먼저
+     * 채우고 resolved 를 마지막에 세워 안전하게 공개한다.
+     */
+    private static volatile boolean resolved = false;
     private static boolean available = false;
 
     // Nexo MiniMessage: AdventureUtils.MINI_MESSAGE.deserialize(String)
@@ -33,17 +38,21 @@ public final class NexoHook {
     private static Method itemFromIdMethod;
     private static Method itemBuilderBuildMethod;
 
-    public static synchronized boolean isAvailable() {
+    public static boolean isAvailable() {
         if (!resolved) {
-            resolve();
+            synchronized (NexoHook.class) {
+                if (!resolved) {
+                    resolve();
+                }
+            }
         }
         return available;
     }
 
     private static void resolve() {
-        resolved = true;
         if (Bukkit.getPluginManager().getPlugin("Nexo") == null) {
             available = false;
+            resolved = true;
             return;
         }
         // 태그 리졸버(MiniMessage) 연동 시도 — 실패해도 아이템 연동은 별도로 가능.
@@ -66,6 +75,7 @@ public final class NexoHook {
         }
         // glyph/shift 렌더가 목적이므로 MiniMessage 연동이 되면 available=true.
         available = deserializeMethod != null || itemFromIdMethod != null;
+        resolved = true;
     }
 
     /** Nexo MiniMessage 로 파싱. 실패 시 null(→ 폴백). */

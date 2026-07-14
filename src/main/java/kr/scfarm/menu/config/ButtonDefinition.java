@@ -3,7 +3,6 @@ package kr.scfarm.menu.config;
 import kr.scfarm.menu.button.ButtonType;
 import org.bukkit.configuration.ConfigurationSection;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -35,7 +34,6 @@ public final class ButtonDefinition {
     private final int[] slots;
     private final ItemSpec item;
     private final SoundSpec sound;
-    private final boolean closeOnClick;
     private final ButtonType type;
 
     // type 별 필드
@@ -49,14 +47,13 @@ public final class ButtonDefinition {
     private final Requirement viewRequirement;
     private final Requirement clickRequirement;
 
-    private ButtonDefinition(String id, int[] slots, ItemSpec item, SoundSpec sound, boolean closeOnClick,
+    private ButtonDefinition(String id, int[] slots, ItemSpec item, SoundSpec sound,
                              ButtonType type, String warp, String command, RunAs runAs, String open,
                              MessageSpec message, Requirement viewRequirement, Requirement clickRequirement) {
         this.id = id;
         this.slots = slots;
         this.item = item;
         this.sound = sound;
-        this.closeOnClick = closeOnClick;
         this.type = type;
         this.warp = warp;
         this.command = command;
@@ -71,7 +68,6 @@ public final class ButtonDefinition {
         int[] slots = parseSlots(section);
         ItemSpec item = ItemSpec.from(section.getConfigurationSection("item"));
         SoundSpec sound = SoundSpec.from(section.getConfigurationSection("sound"));
-        boolean closeOnClick = section.getBoolean("close-on-click", true);
         ButtonType type = ButtonType.from(section.getString("type"));
 
         String warp = section.getString("warp");
@@ -83,7 +79,7 @@ public final class ButtonDefinition {
         Requirement viewRequirement = Requirement.from(section.getConfigurationSection("view-requirement"));
         Requirement clickRequirement = Requirement.from(section.getConfigurationSection("click-requirement"));
 
-        return new ButtonDefinition(id, slots, item, sound, closeOnClick, type, warp, command, runAs,
+        return new ButtonDefinition(id, slots, item, sound, type, warp, command, runAs,
                 open, message, viewRequirement, clickRequirement);
     }
 
@@ -163,10 +159,6 @@ public final class ButtonDefinition {
 
     public SoundSpec sound() {
         return sound;
-    }
-
-    public boolean closeOnClick() {
-        return closeOnClick;
     }
 
     public ButtonType type() {
