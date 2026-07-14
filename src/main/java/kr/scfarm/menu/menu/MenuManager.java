@@ -113,7 +113,10 @@ public final class MenuManager {
             long millis = config.cooldownSeconds() * 1000L;
             long remaining = cooldownManager.tryConsume(player.getUniqueId(), millis);
             if (remaining > 0) {
-                sendMessage(player, "cooldown", Map.of("seconds", String.valueOf(config.cooldownSeconds())));
+                // 경고는 쿨다운 사이클당 1회만 — 연타해도 메시지가 반복 출력되지 않는다.
+                if (cooldownManager.shouldWarn(player.getUniqueId())) {
+                    sendMessage(player, "cooldown", Map.of("seconds", String.valueOf(config.cooldownSeconds())));
+                }
                 return false;
             }
         }
@@ -196,14 +199,17 @@ public final class MenuManager {
             return;
         }
 
-        // 실제 동작(명령/이동/메뉴열기/메시지)은 클릭 이벤트 처리 밖(다음 틱)에서 실행
-        // → 명령이 다른 GUI 를 여는 경우의 인벤토리 꼬임 방지.
-        plugin.getServer().getScheduler().runTask(plugin, () -> {
+        // 명령을 실행하는 타입(warp/command)은 GUI 닫힘 후 0.5초(10틱) 뒤 실행,
+        // 나머지(message/open/close)는 다음 틱 실행.
+        // → 명령이 다른 GUI 를 여는 경우의 인벤토리 꼬임/충돌 방지.
+        long delayTicks = (button.type() == ButtonType.WARP || button.type() == ButtonType.COMMAND)
+                ? 10L : 1L;
+        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
             if (!player.isOnline()) {
                 return;
             }
             handler.handle(player, button);
-        });
+        }, delayTicks);
     }
 
     public CooldownManager cooldownManager() {

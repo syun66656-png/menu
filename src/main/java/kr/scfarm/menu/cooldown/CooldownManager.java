@@ -1,5 +1,6 @@
 package kr.scfarm.menu.cooldown;
 
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -8,9 +9,12 @@ public final class CooldownManager {
 
     private final ConcurrentHashMap<UUID, Long> lastOpen = new ConcurrentHashMap<>();
 
+    /** 현재 쿨다운 사이클에서 이미 경고 메시지를 받은 플레이어(사이클당 1회만 경고). */
+    private final Set<UUID> warned = ConcurrentHashMap.newKeySet();
+
     /**
      * 쿨다운이 남아 있으면 남은 밀리초, 통과면 0 을 반환한다.
-     * 통과 시 마지막 오픈 시각을 갱신한다.
+     * 통과 시 마지막 오픈 시각을 갱신하고 경고 플래그를 초기화한다.
      */
     public long tryConsume(UUID player, long cooldownMillis) {
         if (cooldownMillis <= 0) {
@@ -25,10 +29,22 @@ public final class CooldownManager {
             }
         }
         lastOpen.put(player, now);
+        warned.remove(player);
         return 0;
+    }
+
+    /**
+     * 쿨다운 경고를 보낼지 판정한다. 한 쿨다운 사이클에서 최초 1회만 true 를
+     * 반환하고, 이후 같은 사이클의 반복 시도에는 false 를 반환한다
+     * (연타 시 경고 메시지 도배 방지). 사이클이 끝나고 메뉴가 정상적으로
+     * 열리면 {@link #tryConsume} 에서 플래그가 초기화된다.
+     */
+    public boolean shouldWarn(UUID player) {
+        return warned.add(player);
     }
 
     public void clear(UUID player) {
         lastOpen.remove(player);
+        warned.remove(player);
     }
 }
