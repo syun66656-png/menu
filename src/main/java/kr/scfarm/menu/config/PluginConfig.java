@@ -8,7 +8,6 @@ public final class PluginConfig {
     private final boolean cooldownEnabled;
     private final int cooldownSeconds;
 
-    private final String warpMode;
     private final String warpCommandFormat;
 
     private final String reloadCommand;
@@ -23,7 +22,6 @@ public final class PluginConfig {
         this.cooldownEnabled = config.getBoolean("cooldown.enabled", true);
         this.cooldownSeconds = config.getInt("cooldown.seconds", 3);
 
-        this.warpMode = config.getString("warp.mode", "console-command");
         this.warpCommandFormat = config.getString("warp.command-format", "warpother {player} {warp}");
 
         this.reloadCommand = config.getString("reload.command", "메뉴리로드");
@@ -45,10 +43,6 @@ public final class PluginConfig {
 
     public int cooldownSeconds() {
         return cooldownSeconds;
-    }
-
-    public String warpMode() {
-        return warpMode;
     }
 
     public String warpCommandFormat() {

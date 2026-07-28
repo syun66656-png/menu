@@ -13,24 +13,21 @@ public final class CooldownManager {
     private final Set<UUID> warned = ConcurrentHashMap.newKeySet();
 
     /**
-     * 쿨다운이 남아 있으면 남은 밀리초, 통과면 0 을 반환한다.
-     * 통과 시 마지막 오픈 시각을 갱신하고 경고 플래그를 초기화한다.
+     * 쿨다운을 통과하면 true(마지막 오픈 시각 갱신 + 경고 플래그 초기화),
+     * 아직 쿨다운 중이면 false.
      */
-    public long tryConsume(UUID player, long cooldownMillis) {
+    public boolean tryConsume(UUID player, long cooldownMillis) {
         if (cooldownMillis <= 0) {
-            return 0;
+            return true;
         }
         long now = System.currentTimeMillis();
         Long previous = lastOpen.get(player);
-        if (previous != null) {
-            long elapsed = now - previous;
-            if (elapsed < cooldownMillis) {
-                return cooldownMillis - elapsed;
-            }
+        if (previous != null && now - previous < cooldownMillis) {
+            return false;
         }
         lastOpen.put(player, now);
         warned.remove(player);
-        return 0;
+        return true;
     }
 
     /**

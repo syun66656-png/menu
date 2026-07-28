@@ -28,26 +28,22 @@ public final class WarpBridge {
         return plugin != null && plugin.isEnabled();
     }
 
-    /**
-     * warp 이동을 위임 실행한다. WarpCraft 미작동이면 안내 메시지 후 false.
-     *
-     * @return 위임에 성공(명령 디스패치)하면 true
-     */
-    public boolean warp(Player player, String warp) {
+    /** warp 이동을 위임 실행한다. WarpCraft 미작동이면 안내 메시지만 보낸다. */
+    public void warp(Player player, String warp) {
         if (warp == null || warp.isBlank()) {
-            return false;
+            return;
         }
         if (!isAvailable()) {
             String msg = config.message("warp-unavailable");
             if (msg != null && !msg.isBlank()) {
                 player.sendMessage(Text.mm(msg));
             }
-            return false;
+            return;
         }
         String command = Text.replace(config.warpCommandFormat(), Map.of(
                 "player", player.getName(),
                 "warp", warp
         ));
-        return Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
     }
 }

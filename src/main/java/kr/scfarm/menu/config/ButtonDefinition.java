@@ -30,7 +30,6 @@ public final class ButtonDefinition {
         }
     }
 
-    private final String id;
     private final int[] slots;
     private final ItemSpec item;
     private final SoundSpec sound;
@@ -47,10 +46,9 @@ public final class ButtonDefinition {
     private final Requirement viewRequirement;
     private final Requirement clickRequirement;
 
-    private ButtonDefinition(String id, int[] slots, ItemSpec item, SoundSpec sound,
+    private ButtonDefinition(int[] slots, ItemSpec item, SoundSpec sound,
                              ButtonType type, String warp, String command, RunAs runAs, String open,
                              MessageSpec message, Requirement viewRequirement, Requirement clickRequirement) {
-        this.id = id;
         this.slots = slots;
         this.item = item;
         this.sound = sound;
@@ -64,7 +62,7 @@ public final class ButtonDefinition {
         this.clickRequirement = clickRequirement;
     }
 
-    public static ButtonDefinition from(String id, ConfigurationSection section) {
+    public static ButtonDefinition from(ConfigurationSection section) {
         int[] slots = parseSlots(section);
         ItemSpec item = ItemSpec.from(section.getConfigurationSection("item"));
         SoundSpec sound = SoundSpec.from(section.getConfigurationSection("sound"));
@@ -79,7 +77,7 @@ public final class ButtonDefinition {
         Requirement viewRequirement = Requirement.from(section.getConfigurationSection("view-requirement"));
         Requirement clickRequirement = Requirement.from(section.getConfigurationSection("click-requirement"));
 
-        return new ButtonDefinition(id, slots, item, sound, type, warp, command, runAs,
+        return new ButtonDefinition(slots, item, sound, type, warp, command, runAs,
                 open, message, viewRequirement, clickRequirement);
     }
 
@@ -143,10 +141,6 @@ public final class ButtonDefinition {
                 }
             }
         }
-    }
-
-    public String id() {
-        return id;
     }
 
     public int[] slots() {

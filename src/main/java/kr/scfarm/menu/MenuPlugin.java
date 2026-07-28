@@ -55,8 +55,4 @@ public final class MenuPlugin extends JavaPlugin {
             commandRegistrar.unregister(null);
         }
     }
-
-    public MenuManager menuManager() {
-        return menuManager;
-    }
 }

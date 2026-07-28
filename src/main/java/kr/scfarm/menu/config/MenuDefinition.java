@@ -65,7 +65,7 @@ public final class MenuDefinition {
             for (String key : buttonsSection.getKeys(false)) {
                 ConfigurationSection buttonSection = buttonsSection.getConfigurationSection(key);
                 if (buttonSection != null) {
-                    buttons.put(key, ButtonDefinition.from(key, buttonSection));
+                    buttons.put(key, ButtonDefinition.from(buttonSection));
                 }
             }
         }

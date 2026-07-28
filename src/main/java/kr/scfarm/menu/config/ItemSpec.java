@@ -1,11 +1,15 @@
 package kr.scfarm.menu.config;
 
-import kr.scfarm.menu.util.ItemBuilder;
 import kr.scfarm.menu.util.NexoHook;
+import kr.scfarm.menu.util.Text;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +46,6 @@ public final class ItemSpec {
         this.glow = glow;
     }
 
-    /** map 형태(예: {@code { material: PAPER, name: "..." }}) 또는 섹션에서 파싱. */
     public static ItemSpec from(ConfigurationSection section) {
         if (section == null) {
             return new ItemSpec(null, Material.PAPER, null, null, null, List.of(), 1, false);
@@ -76,33 +79,45 @@ public final class ItemSpec {
         return cached.clone();
     }
 
+    /** 메타를 한 번만 꺼내고 한 번만 되쓰는 단일 왕복 구성. */
+    @SuppressWarnings("deprecation")
     private ItemStack construct() {
-        ItemStack base = null;
+        ItemStack stack = null;
         if (nexoItem != null && !nexoItem.isBlank()) {
-            base = NexoHook.itemFromId(nexoItem);
+            stack = NexoHook.itemFromId(nexoItem);
         }
-        ItemBuilder builder = (base != null) ? ItemBuilder.of(base) : ItemBuilder.of(material);
+        if (stack == null) {
+            stack = new ItemStack(material);
+        }
+        stack.setAmount(amount);
 
-        builder.amount(amount);
-        if (name != null) {
-            builder.name(name);
+        ItemMeta meta = stack.getItemMeta();
+        if (meta != null) {
+            if (name != null) {
+                meta.displayName(Text.item(name));
+            }
+            if (lore != null && !lore.isEmpty()) {
+                List<Component> lines = new ArrayList<>(lore.size());
+                for (String line : lore) {
+                    lines.add(Text.item(line));
+                }
+                meta.lore(lines);
+            }
+            if (customModelData != null) {
+                meta.setCustomModelData(customModelData);
+            }
+            if (itemModel != null && !itemModel.isBlank()) {
+                NamespacedKey key = NamespacedKey.fromString(itemModel);
+                if (key != null) {
+                    meta.setItemModel(key);
+                }
+            }
+            if (glow) {
+                meta.addEnchant(Enchantment.UNBREAKING, 1, true);
+                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            }
+            stack.setItemMeta(meta);
         }
-        if (lore != null && !lore.isEmpty()) {
-            builder.lore(lore);
-        }
-        if (customModelData != null) {
-            builder.customModelData(customModelData);
-        }
-        if (itemModel != null && !itemModel.isBlank()) {
-            builder.itemModel(NamespacedKey.fromString(itemModel));
-        }
-        if (glow) {
-            builder.glow();
-        }
-        return builder.build();
-    }
-
-    public Material material() {
-        return material;
+        return stack;
     }
 }

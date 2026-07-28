@@ -2,7 +2,6 @@ package kr.scfarm.menu.menu;
 
 import kr.scfarm.menu.button.ButtonType;
 import kr.scfarm.menu.button.handler.ButtonHandler;
-import kr.scfarm.menu.button.handler.CloseHandler;
 import kr.scfarm.menu.button.handler.CommandHandler;
 import kr.scfarm.menu.button.handler.MessageHandler;
 import kr.scfarm.menu.button.handler.OpenHandler;
@@ -73,7 +72,7 @@ public final class MenuManager {
         map.put(ButtonType.COMMAND, new CommandHandler());
         map.put(ButtonType.MESSAGE, new MessageHandler());
         map.put(ButtonType.OPEN, new OpenHandler(this));
-        map.put(ButtonType.CLOSE, new CloseHandler());
+        // CLOSE 는 핸들러 없음 — 클릭 즉시 닫기(execute)로 이미 처리된다.
         return map;
     }
 
@@ -85,40 +84,32 @@ public final class MenuManager {
         return menus;
     }
 
-    public MenuDefinition menu(String id) {
-        return menus.get(id);
-    }
-
     /**
      * 메뉴를 연다.
      *
      * @param bypassCooldown open 타입 전환처럼 쿨다운을 무시할지
-     * @return 실제로 열렸으면 true
      */
-    public boolean open(Player player, String menuId, boolean bypassCooldown) {
+    public void open(Player player, String menuId, boolean bypassCooldown) {
         MenuDefinition definition = menus.get(menuId);
         if (definition == null) {
-            return false;
+            return;
         }
 
         // open-permission 검사.
         String openPermission = definition.openPermission();
         if (openPermission != null && !openPermission.isBlank() && !player.hasPermission(openPermission)) {
             sendMessage(player, "no-permission", Map.of());
-            return false;
+            return;
         }
 
         // 쿨다운 검사(§9-1).
-        if (!bypassCooldown && config.cooldownEnabled()) {
-            long millis = config.cooldownSeconds() * 1000L;
-            long remaining = cooldownManager.tryConsume(player.getUniqueId(), millis);
-            if (remaining > 0) {
-                // 경고는 쿨다운 사이클당 1회만 — 연타해도 메시지가 반복 출력되지 않는다.
-                if (cooldownManager.shouldWarn(player.getUniqueId())) {
-                    sendMessage(player, "cooldown", Map.of("seconds", String.valueOf(config.cooldownSeconds())));
-                }
-                return false;
+        if (!bypassCooldown && config.cooldownEnabled()
+                && !cooldownManager.tryConsume(player.getUniqueId(), config.cooldownSeconds() * 1000L)) {
+            // 경고는 쿨다운 사이클당 1회만 — 연타해도 메시지가 반복 출력되지 않는다.
+            if (cooldownManager.shouldWarn(player.getUniqueId())) {
+                sendMessage(player, "cooldown", Map.of("seconds", String.valueOf(config.cooldownSeconds())));
             }
+            return;
         }
 
         MenuHolder holder = new MenuHolder();
@@ -132,7 +123,6 @@ public final class MenuManager {
         if (definition.openSound() != null) {
             definition.openSound().play(player);
         }
-        return true;
     }
 
     /** 필러 + 버튼을 view-requirement 를 반영해 배치. */
